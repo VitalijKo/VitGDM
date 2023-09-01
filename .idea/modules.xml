@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/../SigitaCoin/.idea/SigitaCoin.iml" filepath="$PROJECT_DIR$/../SigitaCoin/.idea/SigitaCoin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../Sigitagram/.idea/Sigitagram.iml" filepath="$PROJECT_DIR$/../Sigitagram/.idea/Sigitagram.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/VitGDM.iml" filepath="$PROJECT_DIR$/.idea/VitGDM.iml" />
+    </modules>
+  </component>
+</project>

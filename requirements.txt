@@ -1,0 +1,5 @@
+Eel
+pygame
+Pymem
+Pillow
+pywin32
