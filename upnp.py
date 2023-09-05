@@ -24,7 +24,7 @@ class PortMapping:
         self.lease_duration = lease_duration
 
     def __str__(self):
-        return '%s %s %s %s %s %s %s %s' % (
+        return ' '.join([
             self.remote_host,
             self.public_port,
             self.protocol,
@@ -33,16 +33,16 @@ class PortMapping:
             self.is_enabled,
             self.description,
             self.lease_duration
-        )
+        ])
 
     @classmethod
     def parse_port_map_xml(cls, xml_text, router_type):
-        """Parses a UPnP GetGenericPortMappingEntry xml response."""
         doc = ElementTree.fromstring(xml_text)
 
-        generic_portmap_tag_text = f"{{{router_type}}}GetGenericPortMappingEntryResponse"
+        generic_portmap_tag_text = f'{{{router_type}}}GetGenericPortMappingEntryResponse'
 
         response_tag = doc[0][0]
+
         if response_tag.tag == generic_portmap_tag_text:
             remote_host = '*'
             public_port = 0
@@ -56,18 +56,25 @@ class PortMapping:
             for prop in response_tag:
                 if prop.tag == 'NewRemoteHost':
                     remote_host = prop.text if prop.text else '*'
+
                 elif prop.tag == 'NewExternalPort':
                     public_port = prop.text if prop.text else 0
+
                 elif prop.tag == 'NewProtocol':
                     protocol = prop.text if prop.text else '-'
+
                 elif prop.tag == 'NewInternalPort':
                     private_port = prop.text if prop.text else 0
+
                 elif prop.tag == 'NewInternalClient':
                     private_ip = prop.text if prop.text else '*'
+
                 elif prop.tag == 'NewEnabled':
                     is_enabled = prop.text if prop.text else '-'
+
                 elif prop.tag == 'NewPortMappingDescription':
                     description = prop.text if prop.text else 'None'
+
                 elif prop.tag == 'NewLeaseDuration':
                     lease_duration = prop.text if prop.text else '-'
 
@@ -81,8 +88,6 @@ class PortMapping:
                 description=description,
                 lease_duration=lease_duration
             )
-        else:
-            return None
 
 
 class UPnp:
@@ -92,26 +97,27 @@ class UPnp:
 
     @classmethod
     def add_port_mapping(cls, router_uuid, protocol, public_port, private_ip, private_port):
-        """Adds a port mapping to a router"""
-        print("Adding port mapping (%s, %s, %s, %s, %s)"
-              % (router_uuid, protocol, public_port, private_ip, private_port))
+        print(f'Adding port mapping ({router_uuid}, {protocol}, {public_port}, {private_ip}, {private_port})')
 
         router = UPnp._find_router(router_uuid)
 
         if not router:
-            print('No router found with uuid "%s"' % router_uuid)
+            print(f'No router found with uuid {router_uuid}')
+
             return
 
-        url = '{}{}'.format(router.base_url, router.control_url)
-        print('Adding port mapping (%s %s/%s) at url "%s"' % (private_ip, private_port, protocol, url))
+        url = f'{router.base_url}{router.control_url}'
+
+        print(f'Adding port mapping ({private_ip} {private_port}/{protocol}) at {url}')
 
         headers = {
-            'Host': '{}:{}'.format(router.ip, router.port),
+            'Host': f'{router.ip}:{router.port}',
             'Content-Type': 'text/xml; charset=utf-8',
-            'SOAPACTION': '{}#AddPortMapping'.format(router.type)
+            'SOAPACTION': f'{router.type}#AddPortMapping'
         }
 
-        mapping_description = 'dave_upnp_{}:{}'.format(private_ip, private_port)
+        mapping_description = f'dave_upnp_{private_ip}:{private_port}'
+
         data = UPnp._add_port_mapping_template.format(
             public_port,
             protocol,
@@ -121,50 +127,53 @@ class UPnp:
         )
 
         response = requests.post(url, data=data, headers=headers)
+
         print(response.text)
 
     @classmethod
     def delete_port_mapping(cls, router_uuid, protocol, public_port):
-        """Deletes a port mapping from a router"""
-        print("Deleting port mapping (%s, %s, %s)"
-              % (router_uuid, protocol, public_port))
+        print(f'Deleting port mapping ({router_uuid}, {protocol}, {public_port})')
 
         router = UPnp._find_router(router_uuid)
 
         if not router:
-            print('No router found with uuid "%s"' % router_uuid)
+            print(f'No router found with uuid {router_uuid}')
+
             return
 
-        url = '{}{}'.format(router.base_url, router.control_url)
-        print('Deleting port mapping (%s/%s) at url "%s"' % (public_port, protocol, url))
+
+        url = f'{router.base_url}{router.control_url}'
+
+        print(f'Deleting port mapping ({public_port}/{protocol}) at {url}')
 
         headers = {
-            'Host': '{}:{}'.format(router.ip, router.port),
+            'Host': f'{router.ip}:{router.port}',
             'Content-Type': 'text/xml; charset=utf-8',
-            'SOAPACTION': '{}#DeletePortMapping'.format(router.type)
+            'SOAPACTION': f'{router.type}#DeletePortMapping'
         }
 
         data = UPnp._delete_port_mapping_template.format(public_port, protocol)
 
         response = requests.post(url, data=data, headers=headers)
+
         print(response.text)
 
     @classmethod
     def list_port_mappings(cls, router_uuid):
-        """Lists the port mappings for a router"""
-
         router = UPnp._find_router(router_uuid)
 
         if not router:
-            print('No router found with uuid "%s"' % router_uuid)
+            print(f'No router found with uuid {router_uuid}')
+
             return
 
-        url = '{}{}'.format(router.base_url, router.control_url)
+
+        url = f'{router.base_url}{router.control_url}'
 
         headers = {
-            'Host': '{}:{}'.format(router.ip, router.port),
+            'Host': f'{router.ip}:{router.port}',
             'Content-Type': 'text/xml; charset=utf-8',
-            'SOAPACTION': '{}#GetGenericPortMappingEntry'.format(router.type)
+            'SOAPACTION': f'{router.type}#GetGenericPortMappingEntry'
         }
 
         index = -1
@@ -176,36 +185,38 @@ class UPnp:
             data = UPnp._list_port_mappings_template.format(index)
             response = requests.post(url, data=data, headers=headers)
             portmap = PortMapping.parse_port_map_xml(response.text, router.type)
-            if not portmap:
-                portmap_found = False
-            else:
+
+            if portmap:
                 portmaps.append(portmap)
 
-        if len(portmaps) > 0:
-            template = "{0:25}{1:30}{2:30}{3:10}{4:10}{5:20}"
-            print(template.format("DESC", "PUBLIC", "PRIVATE", "PROTOCOL", "ENABLED", "LEASE DURATION"))
+            else:
+                portmap_found = False   
+
+        if portmaps:
+            template = '{0:25}{1:30}{2:30}{3:10}{4:10}{5:20}'
+
+            print(template.format('DESC', 'PUBLIC', 'PRIVATE', 'PROTOCOL', 'ENABLED', 'LEASE DURATION'))
+
             for portmap in portmaps:
                 print(
                     template.format(
                         portmap.description,
-                        '{}:{}'.format(portmap.remote_host, portmap.public_port),
-                        '{}:{}'.format(portmap.private_ip, portmap.private_port),
+                        f'{portmap.remote_host}:{portmap.public_port}',
+                        f'{portmap.private_ip}:{portmap.private_port}',
                         portmap.protocol,
                         'Yes' if portmap.is_enabled else 'No',
                         portmap.lease_duration
                     )
                 )
         else:
-            print("No portmaps found!")
+            print('No portmaps found')
 
     @classmethod
     def _find_router(cls, router_uuid):
         routers = SSDP.list()
 
         _default_router = None
-        router = next(
-            (r for r in routers if r.uuid == router_uuid),
-            _default_router
-        )
+
+        router = next((r for r in routers if r.uuid == router_uuid), _default_router)
 
         return router
