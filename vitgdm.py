@@ -21,62 +21,20 @@ from openclientport import open_client_port
 
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = 'hide'
 
-client = None
-display_hwnd = None
-game_hwnd = None
-app_hwnd = False
-player_icon_base64 = None
-prev_level_id = None
-prev_player_x = None
-interface_update_countdown = 50
-window_check_countdown = 100
-root = 'C://VitGDM/'
-root_images = root + 'images/'
-settings_path = root + 'settings.dat'
-downloading = ''
-connected_players_info = {}
-connected_players_icons = {}
-connected_players_icons_base64 = {}
 
-global_offsets = {
-    'acc_name': [0x108],
-}
+class RECT(Structure):
+    _fields_ = [
+        ('left', c_long),
+        ('top', c_long),
+        ('right', c_long),
+        ('bottom', c_long),
+    ]
 
-game_offsets = {
-    'percent': [0x164, 0x3C0, 0x12C],
-    'is_dead': [0x164, 0x39C],
-    'level_id': [0x2A0],
-    'cam_y': [0x164, 0x490],
-    'is_reverse': [0x164, 0x47C],
-}
+    def width(self):
+        return self.right - self.left
 
-player_1_offsets = {
-    'x': [0x164, 0x224, 0x4E8, 0xB4, 0x67C],
-    'y': [0x164, 0x224, 0x680],
-    'rotation': [0x164, 0x224, 0x020],
-    'is_ship': [0x164, 0x224, 0x638],
-    'is_ball': [0x164, 0x224, 0x63A],
-    'is_ufo': [0x164, 0x224, 0x639],
-    'is_wave': [0x164, 0x224, 0x63B],
-    'is_robot': [0x164, 0x224, 0x63C],
-    'is_spider': [0x164, 0x224, 0x63D],
-    'gravity': [0x164, 0x224, 0x63E],
-    'size': [0x164, 0x224, 0x644],
-}
-
-player_2_offsets = {
-    'x': [0x164, 0x228, 0x4E8, 0xB4, 0x67C],
-    'y': [0x164, 0x228, 0x680],
-    'rotation': [0x164, 0x228, 0x020],
-    'is_ship': [0x164, 0x228, 0x638],
-    'is_ball': [0x164, 0x228, 0x63A],
-    'is_ufo': [0x164, 0x228, 0x639],
-    'is_wave': [0x164, 0x228, 0x63B],
-    'is_robot': [0x164, 0x228, 0x63C],
-    'is_spider': [0x164, 0x228, 0x63D],
-    'gravity': [0x164, 0x228, 0x63E],
-    'size': [0x164, 0x228, 0x644],
-}
+    def height(self):
+        return self.bottom - self.top
 
 
 def get_addr(offsets):
@@ -775,11 +733,7 @@ def load_settings():
             except:
                 pass
 
-            if setting[1] == 'True':
-                setting[1] = True
-
-            elif setting[1] == 'False':
-                setting[1] = False
+            setting[1] = setting[1] == 'True'
 
             settings.append(setting[0])
             settings.append(setting[1])
@@ -815,21 +769,6 @@ def init_account_icons():
         player_icon_base64 = 'data:image/png;base64,' + base64.b64encode(image_file.read()).decode('utf-8')
 
     eel.set_account_info(acc_name, player_icon_base64)
-
-
-class RECT(Structure):
-    _fields_ = [
-        ('left', c_long),
-        ('top', c_long),
-        ('right', c_long),
-        ('bottom', c_long),
-    ]
-
-    def width(self):
-        return self.right - self.left
-
-    def height(self):
-        return self.bottom - self.top
 
 
 def make_on_top(window):
@@ -885,8 +824,12 @@ def prepare(init=True):
 
         make_on_top(display_hwnd)
 
-        win32gui.SetWindowLong(display_hwnd, win32con.GWL_EXSTYLE,
-                               win32gui.GetWindowLong(display_hwnd, win32con.GWL_EXSTYLE) | win32con.WS_EX_LAYERED)
+        win32gui.SetWindowLong(
+            display_hwnd,
+            win32con.GWL_EXSTYLE,
+            win32gui.GetWindowLong(display_hwnd, win32con.GWL_EXSTYLE) | win32con.WS_EX_LAYERED
+        )
+
         win32gui.SetLayeredWindowAttributes(display_hwnd, win32api.RGB(255, 0, 128), 0, win32con.LWA_COLORKEY)
 
     else:
@@ -1040,19 +983,77 @@ def application():
     eel.init('ui')
 
     try:
-        eel.start('app.html',
-                  disable_cache=True,
-                  close_callback=close_callback,
-                  cmdline_args=[
-                      '--incognito',
-                      '--no-experiments',
-                      '--window-size=700,800',
-                      '--window-position=700,220'
-                  ]
-                  )
+        eel.start(
+            'app.html',
+            disable_cache=True,
+            close_callback=close_callback,
+            cmdline_args=[
+                '--incognito',
+                '--no-experiments',
+                '--window-size=700,800',
+                '--window-position=700,220'
+            ]
+         )
     except:
         os.kill(os.getpid(), signal.SIGTERM)
 
+
+client = None
+display_hwnd = None
+game_hwnd = None
+app_hwnd = False
+player_icon_base64 = None
+prev_level_id = None
+prev_player_x = None
+interface_update_countdown = 50
+window_check_countdown = 100
+root = 'C://VitGDM/'
+root_images = root + 'images/'
+settings_path = root + 'settings.dat'
+downloading = ''
+connected_players_info = {}
+connected_players_icons = {}
+connected_players_icons_base64 = {}
+
+global_offsets = {
+    'acc_name': [0x108],
+}
+
+game_offsets = {
+    'percent': [0x164, 0x3C0, 0x12C],
+    'is_dead': [0x164, 0x39C],
+    'level_id': [0x2A0],
+    'cam_y': [0x164, 0x490],
+    'is_reverse': [0x164, 0x47C],
+}
+
+player_1_offsets = {
+    'x': [0x164, 0x224, 0x4E8, 0xB4, 0x67C],
+    'y': [0x164, 0x224, 0x680],
+    'rotation': [0x164, 0x224, 0x020],
+    'is_ship': [0x164, 0x224, 0x638],
+    'is_ball': [0x164, 0x224, 0x63A],
+    'is_ufo': [0x164, 0x224, 0x639],
+    'is_wave': [0x164, 0x224, 0x63B],
+    'is_robot': [0x164, 0x224, 0x63C],
+    'is_spider': [0x164, 0x224, 0x63D],
+    'gravity': [0x164, 0x224, 0x63E],
+    'size': [0x164, 0x224, 0x644],
+}
+
+player_2_offsets = {
+    'x': [0x164, 0x228, 0x4E8, 0xB4, 0x67C],
+    'y': [0x164, 0x228, 0x680],
+    'rotation': [0x164, 0x228, 0x020],
+    'is_ship': [0x164, 0x228, 0x638],
+    'is_ball': [0x164, 0x228, 0x63A],
+    'is_ufo': [0x164, 0x228, 0x639],
+    'is_wave': [0x164, 0x228, 0x63B],
+    'is_robot': [0x164, 0x228, 0x63C],
+    'is_spider': [0x164, 0x228, 0x63D],
+    'gravity': [0x164, 0x228, 0x63E],
+    'size': [0x164, 0x228, 0x644],
+}
 
 app = threading.Thread(target=application, daemon=True)
 app.start()
