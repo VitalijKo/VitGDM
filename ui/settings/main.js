@@ -20,9 +20,11 @@ save.onclick = function(e) {
     var server = document.querySelector('#server');
     var fps = document.querySelector('#fps');
     var display_icons = document.querySelector('#icons');
-    var settings = {'SERVER': server.value,
-                    'FPS': fps.value,
-                    'ICONS': display_icons.checked};
+    var settings = {
+        'SERVER': server.value,
+        'FPS': fps.value,
+        'ICONS': display_icons.checked
+    };
 
     if (fps.value < 30 || fps.value > 360) {
         SuperAlert.alert({
@@ -37,8 +39,8 @@ save.onclick = function(e) {
     }
 };
 
-check_update.onclick = function() {eel.check_update();};
-open_ports.onclick = function() {eel.open_ports();};
+check_update.onclick = function() { eel.check_update(); };
+open_ports.onclick = function() { eel.open_ports(); };
 
 var account_name = document.querySelector('.account-info-name');
 var account_image = document.querySelector('.account-info-image');
@@ -55,16 +57,19 @@ eel.get_settings()(function(settings) {
 });
 
 eel.expose(set_interface);
+
 function set_interface(info, is_playing) {}
 
 eel.expose(set_account_info);
+
 function set_account_info(acc_name, player_icon) {
     account_name.innerHTML = acc_name;
     account_image.innerHTML = '<img src="' + player_icon + '">';
 }
 
 eel.expose(call_alert);
-function call_alert(status, title, content, code=0, confirmbtn=false) {
+
+function call_alert(status, title, content, code = 0, confirmbtn = false) {
     SuperAlert.alert({
         status: status,
         title: title,

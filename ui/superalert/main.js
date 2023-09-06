@@ -23,14 +23,11 @@ const SuperAlert = {
         alert.setAttribute('class', 'alert_container');
         modal.appendChild(alert);
 
-        if (title == '' || title == null)
-            title = this.title;
+        if (title == '' || title == null) title = this.title;
 
-        if (status == '' || status == null)
-            status = this.status;
+        if (status == '' || status == null) status = this.status;
 
-        if (content == '' || content == null)
-            content = this.content;
+        if (content == '' || content == null) content = this.content;
 
         alert.innerHTML = `
                  <div class="alert_heading"></div>
@@ -99,9 +96,7 @@ const SuperAlert = {
         else if (code == 1) {
             document.querySelector('.app-content-headerText').innerHTML = 'Server is off!';
             document.querySelector('.account-info-name').innerHTML = '';
-        }
-
-        else {
+        } else {
             document.querySelector('.app-content-headerText').innerHTML = 'Service unavailable!';
             document.querySelector('.account-info-name').innerHTML = '';
 
