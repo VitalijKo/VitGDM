@@ -27,7 +27,7 @@ class RECT(Structure):
         ('left', c_long),
         ('top', c_long),
         ('right', c_long),
-        ('bottom', c_long),
+        ('bottom', c_long)
     ]
 
     def width(self):
@@ -35,6 +35,79 @@ class RECT(Structure):
 
     def height(self):
         return self.bottom - self.top
+
+
+@eel.expose()
+def download_update():
+    eel.call_alert(
+        'error',
+        'Error',
+        'Some error occured.'
+    )
+
+
+@eel.expose()
+def check_update():
+    update = False
+
+    if update:
+        eel.call_alert(
+            'confirm',
+            'Info',
+            'New version available!',
+            0,
+            True
+        )
+
+    else:
+        eel.call_alert(
+            'success',
+            'Latest version',
+            'You have the latest version of multiplayer.'
+        )
+
+
+@eel.expose()
+def open_ports():
+    try:
+        open_client_port(7575)
+
+        eel.call_alert(
+            'success',
+            'Success',
+            'The ports have been successfully opened!'
+        )
+    except Exception as e:
+        eel.call_alert(
+            'error',
+            'Error',
+            str(e)
+        )
+
+
+@eel.expose()
+def change_settings(data):
+    with open(settings_path, 'w') as settings_file:
+        for key in data:
+            if key == 'FPS':
+                if int(data[key]) > 360:
+                    data[key] = 360
+
+                elif int(data[key]) < 30:
+                    data[key] = 30
+
+            settings_file.write(f'{key}: {data[key]}\n')
+
+    prepare(False)
+
+
+@eel.expose()
+def get_settings():
+    while True:
+        try:
+            return settings
+        except:
+            time.sleep(1)
 
 
 def get_addr(offsets):
@@ -294,8 +367,28 @@ def get_window_coords():
     return window_coords
 
 
-def format_payload(percent, is_dead, p1_icon, p2_icon, p1_x, p1_y, p2_x, p2_y, wx, wy, ww, wh, cam_y,
-                   p1_rotation, p2_rotation, is_reverse, p1_gravity, p2_gravity, p1_size, p2_size):
+def format_payload(
+    percent,
+    is_dead,
+    p1_icon,
+    p2_icon,
+    p1_x,
+    p1_y,
+    p2_x,
+    p2_y,
+    wx,
+    wy,
+    ww,
+    wh,
+    cam_y,
+    p1_rotation,
+    p2_rotation,
+    is_reverse,
+    p1_gravity,
+    p2_gravity,
+    p1_size,
+    p2_size
+):
     payload = \
         str(percent) \
         + ',' + str(is_dead) \
@@ -344,8 +437,29 @@ def parse_payload(player_name, payload):
     p1_size = payload[18]
     p2_size = payload[19]
 
-    return player_name, percent, is_dead, p1_icon, p2_icon, p1_x, p1_y, p2_x, p2_y, wx, wy, ww, wh, cam_y, \
-        p1_rotation, p2_rotation, is_reverse, p1_gravity, p2_gravity, p1_size, p2_size
+    return (
+        player_name,
+        percent,
+        is_dead,
+        p1_icon,
+        p2_icon,
+        p1_x,
+        p1_y,
+        p2_x,
+        p2_y,
+        wx,
+        wy,
+        ww,
+        wh,
+        cam_y,
+        p1_rotation,
+        p2_rotation,
+        is_reverse,
+        p1_gravity,
+        p2_gravity,
+        p1_size,
+        p2_size
+    )
 
 
 def write_info(is_playing, level_name='N/A', level_difficulty='UNRATED', level_id='N/A', capacity='?'):
@@ -375,13 +489,53 @@ def write_info(is_playing, level_name='N/A', level_difficulty='UNRATED', level_i
     eel.set_interface(info, is_playing)
 
 
-def write_connected_players_info(name, percent, is_dead, p1_icon, p2_icon, p1_x, p1_y, p2_x, p2_y, wx, wy, ww, wh,
-                                 cam_y, p1_rotation, p2_rotation, is_reverse, p1_gravity, p2_gravity, p1_size, p2_size):
+def write_connected_players_info(
+    name,
+    percent,
+    is_dead,
+    p1_icon,
+    p2_icon,
+    p1_x,
+    p1_y,
+    p2_x,
+    p2_y,
+    wx,
+    wy,
+    ww,
+    wh,
+    cam_y,
+    p1_rotation,
+    p2_rotation,
+    is_reverse,
+    p1_gravity,
+    p2_gravity,
+    p1_size,
+    p2_size
+):
     global connected_players_info
 
-    connected_players_info[name] = [percent, is_dead, p1_icon, p2_icon, p1_x, p1_y, p2_x, p2_y, wx, wy, ww,
-                                    wh, cam_y, p1_rotation, p2_rotation, is_reverse, p1_gravity, p2_gravity, p1_size,
-                                    p2_size]
+    connected_players_info[name] = [
+        percent,
+        is_dead,
+        p1_icon,
+        p2_icon,
+        p1_x,
+        p1_y,
+        p2_x,
+        p2_y,
+        wx,
+        wy,
+        ww,
+        wh,
+        cam_y,
+        p1_rotation,
+        p2_rotation,
+        is_reverse,
+        p1_gravity,
+        p2_gravity,
+        p1_size
+        p2_size
+    ]
 
     try:
         download_icons(name)
@@ -701,9 +855,9 @@ def connect(ip):
 
 
 def list_to_dict(lst):
-    res_dct = {lst[i]: lst[i + 1] for i in range(0, len(lst), 2)}
+    result = {lst[i]: lst[i + 1] for i in range(0, len(lst), 2)}
 
-    return res_dct
+    return result
 
 
 def load_settings():
@@ -842,7 +996,9 @@ def prepare(init=True):
         display_icons = settings['ICONS']
     except:
         os.remove(settings_path)
+
         settings = load_settings()
+
         server = settings['SERVER']
         FPS = settings['FPS']
         display_icons = settings['ICONS']
@@ -857,79 +1013,6 @@ def prepare(init=True):
             )
 
         eel.set_account_info(acc_name, player_icon_base64)
-
-
-@eel.expose()
-def download_update():
-    eel.call_alert(
-        'error',
-        'Error',
-        'Some error occured.'
-    )
-
-
-@eel.expose()
-def check_update():
-    update = False
-
-    if update:
-        eel.call_alert(
-            'confirm',
-            'Info',
-            'New version available!',
-            0,
-            True
-        )
-
-    else:
-        eel.call_alert(
-            'success',
-            'Latest version',
-            'You have the latest version of multiplayer.'
-        )
-
-
-@eel.expose()
-def open_ports():
-    try:
-        open_client_port(7575)
-
-        eel.call_alert(
-            'success',
-            'Success',
-            'The ports have been successfully opened!'
-        )
-    except Exception as e:
-        eel.call_alert(
-            'error',
-            'Error',
-            str(e)
-        )
-
-
-@eel.expose()
-def change_settings(data):
-    with open(settings_path, 'w') as settings_file:
-        for key in data:
-            if key == 'FPS':
-                if int(data[key]) > 360:
-                    data[key] = 360
-
-                elif int(data[key]) < 30:
-                    data[key] = 30
-
-            settings_file.write(f'{key}: {data[key]}\n')
-
-    prepare(False)
-
-
-@eel.expose()
-def get_settings():
-    while True:
-        try:
-            return settings
-        except:
-            time.sleep(1)
 
 
 def disconnect(close_connection=False):
