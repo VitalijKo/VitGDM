@@ -1,12 +1,12 @@
 window.addEventListener('load', function() {
     setTimeout(function() {
-        var preloader = document.querySelector('.preloader');
+        const preloader = document.querySelector('.preloader');
 
         preloader.style.opacity = 0;
     }, 500);
 
     setTimeout(function() {
-        var preloader = document.querySelector('.preloader');
+        const preloader = document.querySelector('.preloader');
 
         preloader.style.display = 'none';
     }, 1000);

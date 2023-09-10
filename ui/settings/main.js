@@ -1,12 +1,12 @@
 window.addEventListener('load', function() {
     setTimeout(function() {
-        var preloader = document.querySelector('.preloader');
+        const preloader = document.querySelector('.preloader');
 
         preloader.style.opacity = 0;
     }, 500);
 
     setTimeout(function() {
-        var preloader = document.querySelector('.preloader');
+        const preloader = document.querySelector('.preloader');
 
         preloader.style.display = 'none';
     }, 1000);
@@ -17,10 +17,10 @@ var check_update = document.querySelector('#check-update');
 var open_ports = document.querySelector('#open-ports');
 
 save.onclick = function(e) {
-    var server = document.querySelector('#server');
-    var fps = document.querySelector('#fps');
-    var display_icons = document.querySelector('#icons');
-    var settings = {
+    const server = document.querySelector('#server');
+    const fps = document.querySelector('#fps');
+    const display_icons = document.querySelector('#icons');
+    const settings = {
         'SERVER': server.value,
         'FPS': fps.value,
         'ICONS': display_icons.checked
@@ -34,9 +34,9 @@ save.onclick = function(e) {
             code: 0,
             confirmbtn: false
         });
-    } else {
-        eel.change_settings(settings);
     }
+
+    else eel.change_settings(settings);
 };
 
 check_update.onclick = function() { eel.check_update(); };
@@ -47,9 +47,9 @@ var account_image = document.querySelector('.account-info-image');
 var content_header = document.querySelector('.app-content-headerText');
 
 eel.get_settings()(function(settings) {
-    var server = document.querySelector('#server');
-    var fps = document.querySelector('#fps');
-    var display_icons = document.querySelector('#icons');
+    const server = document.querySelector('#server');
+    const fps = document.querySelector('#fps');
+    const display_icons = document.querySelector('#icons');
 
     server.value = settings['SERVER'];
     fps.value = settings['FPS'];
@@ -80,6 +80,5 @@ function call_alert(status, title, content, code = 0, confirmbtn = false) {
 }
 
 window.onresize = function() {
-    if (window.innerWidth > 700)
-        window.resizeTo(700, 800);
+    if (window.innerWidth > 700) window.resizeTo(700, 800);
 };
