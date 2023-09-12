@@ -1,16 +1,20 @@
-window.addEventListener('load', function() {
-    setTimeout(function() {
+window.onload = () => {
+    setTimeout(() => {
         const preloader = document.querySelector('.preloader');
 
         preloader.style.opacity = 0;
     }, 500);
 
-    setTimeout(function() {
+    setTimeout(() => {
         const preloader = document.querySelector('.preloader');
 
         preloader.style.display = 'none';
     }, 1000);
-});
+};
+
+window.onresize = function() {
+    if (window.innerWidth > 1280) window.resizeTo(1280, 800);
+};
 
 var content_header = document.querySelector('.app-content-headerText');
 var items_header = document.querySelector('.items-header');
@@ -65,15 +69,13 @@ function set_interface(info, is_playing) {
             players += '<div class="items-row">' +
                 '<div class="item-cell">';
 
-            if (info['players'][player][0] != 'Downloading icons...')
-                players += '<img src="' + info['players'][player][2] + '">';
+            if (info['players'][player][0] != 'Downloading icons...') players += '<img src="' + info['players'][player][2] + '">';
 
             players += player +
                 '</div>' +
                 '<div class="item-cell">';
 
-            if (info['players'][player][0] == 'Downloading icons...')
-                players += 'Downloading icons...';
+            if (info['players'][player][0] == 'Downloading icons...') players += 'Downloading icons...';
 
             else {
                 players += '<div class="progress-container">' +
@@ -82,14 +84,11 @@ function set_interface(info, is_playing) {
 
                 percent = info['players'][player][0].slice(0, -1);
 
-                if (percent <= 25)
-                    players += ' low" ';
+                if (percent <= 25) players += ' low" ';
 
-                else if (percent <= 50)
-                    players += ' middle" ';
+                else if (percent <= 50) players += ' middle" ';
 
-                else if (percent <= 75)
-                    players += ' high" ';
+                else if (percent <= 75) players += ' high" ';
 
                 players += 'style="width: ' +
                     info['players'][player][0].slice(0, -1) +
@@ -100,8 +99,7 @@ function set_interface(info, is_playing) {
                     (info['players'][player][1] - 0 ? ' Died!' : '');
             }
 
-            players += '</div>' +
-                '</div>';
+            players += '</div></div>';
         });
 
         items.innerHTML = players;
@@ -126,8 +124,3 @@ function call_alert(status, title, content, code = 0, confirmbtn = false) {
         confirmbtn: confirmbtn
     });
 }
-
-window.onresize = function() {
-    if (window.innerWidth > 1280)
-        window.resizeTo(1280, 800);
-};

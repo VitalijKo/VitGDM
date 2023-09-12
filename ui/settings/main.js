@@ -1,22 +1,22 @@
-window.addEventListener('load', function() {
-    setTimeout(function() {
+window.onload = () => {
+    setTimeout(() => {
         const preloader = document.querySelector('.preloader');
 
         preloader.style.opacity = 0;
     }, 500);
 
-    setTimeout(function() {
+    setTimeout(() => {
         const preloader = document.querySelector('.preloader');
 
         preloader.style.display = 'none';
     }, 1000);
-});
+};
 
-var save = document.querySelector('#save');
-var check_update = document.querySelector('#check-update');
-var open_ports = document.querySelector('#open-ports');
+window.onresize = () => {
+    if (window.innerWidth > 700) window.resizeTo(700, 800);
+};
 
-save.onclick = function(e) {
+save.onclick = (e) => {
     const server = document.querySelector('#server');
     const fps = document.querySelector('#fps');
     const display_icons = document.querySelector('#icons');
@@ -39,14 +39,17 @@ save.onclick = function(e) {
     else eel.change_settings(settings);
 };
 
-check_update.onclick = function() { eel.check_update(); };
-open_ports.onclick = function() { eel.open_ports(); };
+check_update.onclick = () => eel.check_update();
+open_ports.onclick = () => eel.open_ports();
 
+var save = document.querySelector('#save');
+var check_update = document.querySelector('#check-update');
+var open_ports = document.querySelector('#open-ports');
 var account_name = document.querySelector('.account-info-name');
 var account_image = document.querySelector('.account-info-image');
 var content_header = document.querySelector('.app-content-headerText');
 
-eel.get_settings()(function(settings) {
+eel.get_settings()((settings) => {
     const server = document.querySelector('#server');
     const fps = document.querySelector('#fps');
     const display_icons = document.querySelector('#icons');
@@ -78,7 +81,3 @@ function call_alert(status, title, content, code = 0, confirmbtn = false) {
         confirmbtn: confirmbtn
     });
 }
-
-window.onresize = function() {
-    if (window.innerWidth > 700) window.resizeTo(700, 800);
-};
