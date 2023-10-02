@@ -1,6 +1,6 @@
 import socket
-import argparse
 import json
+import argparse
 import time
 from threading import Thread, Lock
 from rooms import Rooms, RoomNotFound, NotInRoom, RoomFull
